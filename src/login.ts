@@ -1,9 +1,12 @@
 import { config } from "dotenv";
 import { chromium, type Page } from "playwright";
 
+import { getKamer, setKamer } from "./db/connector.js";
+
 config({ quiet: true });
 
 const KAMERNET_URL = "https://kamernet.nl/";
+const ALERTS_URL = "https://kamernet.nl/account/alerts";
 const LOGIN_TIMEOUT_MS = 120_000;
 const STEP_DELAY_MS = 1_000;
 
@@ -79,6 +82,61 @@ async function logIn(page: Page, email: string, password: string): Promise<void>
   }
 }
 
+async function openPrimarySearch(page: Page): Promise<void> {
+  await page.goto(ALERTS_URL, { waitUntil: "domcontentloaded" });
+  await waitBetweenSteps(page);
+
+  await page
+    .getByRole("button", { name: "Voer zoekopdracht uit", exact: true })
+    .first()
+    .click();
+  await waitBetweenSteps(page);
+}
+
+async function extractRoomHrefs(page: Page): Promise<string[]> {
+  const roomLinks = page.locator('a[target="_blank"][href^="/huren/"]');
+
+  await roomLinks.first().waitFor({ state: "attached" });
+
+  return roomLinks.evaluateAll((links) => [
+    ...new Set(
+      links
+        .map((link) => link.getAttribute("href"))
+        .filter((href): href is string => href !== null),
+    ),
+  ]);
+}
+
+async function processRoomHrefs(page: Page, roomHrefs: string[]): Promise<void> {
+  for (const href of roomHrefs) {
+    if (getKamer(href) !== undefined) {
+      console.log(`Overgeslagen (al aanwezig): ${href}`);
+      continue;
+    }
+
+    console.log(`Wordt gecontroleerd: ${href}`);
+
+    try {
+      const roomUrl = new URL(href, KAMERNET_URL);
+
+      await page.goto(roomUrl.href, { waitUntil: "domcontentloaded" });
+      await page
+        .getByRole("button", { name: "Contacteer verhuurder", exact: true })
+        .click();
+      await page.locator("textarea#message").fill("ik ben op zoek naar een kamer.");
+      // await page.getByRole("button", { name: "Verstuur bericht", exact: true }).click();
+      await waitBetweenSteps(page);
+      setKamer(href);
+
+      console.log(`Opgeslagen: ${href}`);
+    } catch (error) {
+      const message = error instanceof Error ? error.message : String(error);
+
+      console.error(`Controleren mislukt, niet opgeslagen: ${href} (${message})`);
+    }
+  }
+}
+
 async function main(): Promise<void> {
   const email = requiredEnvironmentVariable("KAMERNET_EMAIL").trim();
   const password = requiredEnvironmentVariable("KAMERNET_PASSWORD");
@@ -100,7 +158,19 @@ async function main(): Promise<void> {
     console.log("Inloggegevens invullen...");
     await logIn(page, email, password);
 
-    console.log(`Inloggen gelukt. Huidige pagina: ${page.url()}`);
+    console.log("Alertspagina openen en primaire zoekopdracht uitvoeren...");
+    await openPrimarySearch(page);
+
+    console.log("Kamerlinks verzamelen...");
+    const roomHrefs: string[] = await extractRoomHrefs(page);
+
+    console.log(`Gevonden kamerlinks (${roomHrefs.length}):`);
+    console.log(JSON.stringify(roomHrefs, null, 2));
+
+    console.log("Kamerlinks verwerken...");
+    await processRoomHrefs(page, roomHrefs);
+
+    console.log(`Huidige pagina: ${page.url()}`);
     console.log("De browser blijft open. Sluit de browser of druk op Ctrl+C om te stoppen.");
 
     await new Promise<void>((resolve) => {
