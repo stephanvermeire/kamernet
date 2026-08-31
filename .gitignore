@@ -1,0 +1,12 @@
+node_modules/
+
+# Lokale geheimen; commit alleen het voorbeeldbestand.
+.env
+.env.*
+!.env.example
+
+# Lokale tooling en uitvoer.
+.idea/
+*.log
+playwright-report/
+test-results/
