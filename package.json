@@ -1,11 +1,11 @@
 {
-  "name": "kamernet-login",
+  "name": "kamernet-automation",
   "version": "1.0.0",
   "private": true,
   "type": "module",
-  "description": "Een minimale Playwright-loginopzet voor Kamernet.",
+  "description": "Playwright-automatisering voor het controleren van nieuwe Kamernet-kamers.",
   "scripts": {
-    "login": "tsx src/login.ts",
+    "start": "tsx src/main.ts",
     "typecheck": "tsc --noEmit"
   },
   "engines": {

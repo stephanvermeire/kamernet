@@ -665,9 +665,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"kamernet-login@workspace:.":
+"kamernet-automation@workspace:.":
   version: 0.0.0-use.local
-  resolution: "kamernet-login@workspace:."
+  resolution: "kamernet-automation@workspace:."
   dependencies:
     "@types/node": "npm:^26.4.0"
     dotenv: "npm:^17.4.2"

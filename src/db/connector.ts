@@ -1,6 +1,8 @@
 import { DatabaseSync } from 'node:sqlite';
+import { fileURLToPath } from 'node:url';
 
-const db = new DatabaseSync('mijnDatabase');
+const databasePath = fileURLToPath(new URL('./mijnDatabase', import.meta.url));
+const db = new DatabaseSync(databasePath);
 
 const initDatabase = `
 CREATE TABLE IF NOT EXISTS kamer (
