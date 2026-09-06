@@ -60,7 +60,13 @@ async function main(): Promise<void> {
         break;
       }
 
-      console.log(`Volgende controle over ${pollIntervalSeconds} seconden...`);
+      const nextCheckAt = new Date(Date.now() + pollIntervalSeconds * 1_000);
+      const nextCheckEta = nextCheckAt.toLocaleTimeString("nl-NL", {
+        timeZone: "Europe/Amsterdam",
+      });
+      console.log(
+        `Volgende controle over ${pollIntervalSeconds} seconden (ETA: ${nextCheckEta}, Europe/Amsterdam)...`,
+      );
       await page.waitForTimeout(pollIntervalSeconds * 1_000);
     }
   } finally {
