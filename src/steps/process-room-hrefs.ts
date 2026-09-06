@@ -28,7 +28,7 @@ export async function processRoomHrefs(page: Page, roomHrefs: string[]): Promise
       await page.locator("textarea#message").fill(CONTACT_MESSAGE);
       if(process.env.VERSTUUR_BERICHTEN === "true"){
         console.log("verstuur bericht");
-        // await page.getByRole("button", { name: "Verstuur bericht", exact: true }).click();
+        await page.getByRole("button", { name: "Verstuur bericht", exact: true }).click();
       }
       else{
         console.log("dryrun");
