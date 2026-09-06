@@ -26,6 +26,15 @@ export async function processRoomHrefs(page: Page, roomHrefs: string[]): Promise
         .first()
         .click();
       await page.locator("textarea#message").fill(CONTACT_MESSAGE);
+      const today = new Date();
+      const nextMonth = new Date(today.getFullYear(), today.getMonth() + 1, 1);
+      const moveInDate = `01-${String(nextMonth.getMonth() + 1).padStart(2, "0")}-${nextMonth.getFullYear()}`;
+      await page
+        .locator("#page-content form")
+        .getByText("Wanneer verwacht je te verhuizen?", { exact: true })
+        .locator("xpath=following-sibling::div[1]")
+        .getByPlaceholder("DD-MM-YYYY", { exact: true })
+        .fill(moveInDate);
       if(process.env.VERSTUUR_BERICHTEN === "true"){
         console.log("verstuur bericht");
         await page.getByRole("button", { name: "Verstuur bericht", exact: true }).click();
