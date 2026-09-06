@@ -26,7 +26,14 @@ export async function processRoomHrefs(page: Page, roomHrefs: string[]): Promise
         .first()
         .click();
       await page.locator("textarea#message").fill(CONTACT_MESSAGE);
-      // await page.getByRole("button", { name: "Verstuur bericht", exact: true }).click();
+      if(process.env.VERSTUUR_BERICHTEN === "true"){
+        console.log("verstuur bericht");
+        // await page.getByRole("button", { name: "Verstuur bericht", exact: true }).click();
+      }
+      else{
+        console.log("dryrun");
+      }
+
       await page.waitForTimeout(STEP_DELAY_MS);
       setKamer(href);
 
