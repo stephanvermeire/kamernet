@@ -35,7 +35,7 @@ export async function authenticate(
   await page.getByLabel("Wachtwoord", { exact: true }).fill(password);
   await page.waitForTimeout(STEP_DELAY_MS);
   await page.getByRole("button", { name: "Inloggen", exact: true }).click();
-  await page.waitForTimeout(STEP_DELAY_MS);
+  await page.waitForTimeout(STEP_DELAY_MS * 5);
 
   try {
     await page.waitForURL(
