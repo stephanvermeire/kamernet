@@ -671,7 +671,7 @@ __metadata:
   dependencies:
     "@types/node": "npm:^26.4.0"
     dotenv: "npm:^17.4.2"
-    playwright: "npm:^1.62.1"
+    playwright: "npm:1.62.1"
     sqlite3: "npm:^6.0.1"
     tsx: "npm:^4.23.13"
     typescript: "npm:^7.0.2"
@@ -827,7 +827,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"playwright@npm:^1.62.1":
+"playwright@npm:1.62.1":
   version: 1.62.1
   resolution: "playwright@npm:1.62.1"
   dependencies:
